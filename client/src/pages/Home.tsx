@@ -6,8 +6,14 @@ import { useStateContext } from '../context'
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
+  const contextValue = useStateContext();
 
-  const { address, contract, getCampaigns } = useStateContext();
+  if (!contextValue) {
+    // Handle the case when the context value is null.
+    // You can throw an error or provide a default value.
+    throw new Error('StateContextValue is not available');
+  }
+  const { address, contract, getCampaigns } = contextValue;
 
   const fetchCampaigns = async () => {
     setIsLoading(true);

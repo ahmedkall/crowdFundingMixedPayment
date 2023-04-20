@@ -9,7 +9,14 @@ import { checkIfImage } from '../utils';
 const CreateCampaign = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { publishCampaign } = useStateContext();
+  const contextValue = useStateContext();
+
+  if (!contextValue) {
+    // Handle the case when the context value is null.
+    // You can throw an error or provide a default value.
+    throw new Error('StateContextValue is not available');
+  }
+  const { publishCampaign } = contextValue;
   const [form, setForm] = useState({
     name: '',
     title: '',
@@ -19,11 +26,11 @@ const CreateCampaign = () => {
     image: ''
   });
 
-  const handleFormFieldChange = (fieldName, e) => {
+  const handleFormFieldChange = (fieldName: string, e: { target: { value: any; }; }) => {
     setForm({ ...form, [fieldName]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
     checkIfImage(form.image, async (exists) => {
@@ -53,24 +60,23 @@ const CreateCampaign = () => {
             placeholder="John Doe"
             inputType="text"
             value={form.name}
-            handleChange={(e) => handleFormFieldChange('name', e)}
+            handleChange={(e: any) => handleFormFieldChange('name', e)}
           />
           <FormField 
             labelName="Campaign Title *"
             placeholder="Write a title"
             inputType="text"
             value={form.title}
-            handleChange={(e) => handleFormFieldChange('title', e)}
+            handleChange={(e: any) => handleFormFieldChange('title', e)}
           />
         </div>
 
         <FormField 
-            labelName="Story *"
-            placeholder="Write your story"
-            isTextArea
-            value={form.description}
-            handleChange={(e) => handleFormFieldChange('description', e)}
-          />
+          labelName="Story *"
+          placeholder="Write your story"
+          isTextArea
+          value={form.description}
+          handleChange={(e: any) => handleFormFieldChange('description', e)} inputType={''}          />
 
         <div className="w-full flex justify-start items-center p-4 bg-[#fed96a67] h-[120px] rounded-[10px]">
           <img src={money} alt="money" className="w-[40px] h-[40px] object-contain"/>
@@ -83,14 +89,14 @@ const CreateCampaign = () => {
             placeholder="ETH 0.50"
             inputType="text"
             value={form.target}
-            handleChange={(e) => handleFormFieldChange('target', e)}
+            handleChange={(e: any) => handleFormFieldChange('target', e)}
           />
           <FormField 
             labelName="End Date *"
             placeholder="End Date"
             inputType="date"
             value={form.deadline}
-            handleChange={(e) => handleFormFieldChange('deadline', e)}
+            handleChange={(e: any) => handleFormFieldChange('deadline', e)}
           />
         </div>
 
@@ -99,7 +105,7 @@ const CreateCampaign = () => {
             placeholder="Place image URL of your campaign"
             inputType="url"
             value={form.image}
-            handleChange={(e) => handleFormFieldChange('image', e)}
+            handleChange={(e: any) => handleFormFieldChange('image', e)}
           />
 
           <div className="flex justify-center items-center mt-[40px]">
