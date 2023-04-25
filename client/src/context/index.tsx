@@ -10,6 +10,8 @@ interface StateContextValue {
   publishCampaign: any;
   getCampaigns: () => any;
   getUserCampaigns: () => any;
+  donate: (pId: number, amount: string) => any;
+  getDonations: (pId: number) => any;
 }
 
 const StateContext = createContext<StateContextValue | null>(null);
@@ -59,9 +61,29 @@ export const StateContextProvider = ({ children }: StateContextProviderProps) =>
   const getUserCampaigns = async () => {
     const allCampaigns = await getCampaigns();
 
-    const filteredCampaigns = allCampaigns.filter((campaign: { owner: string | undefined; }) => campaign.owner === address);
+    const filteredCampaigns = allCampaigns.filter((campaign: { owner: string; }) => campaign.owner === address);
 
     return filteredCampaigns;
+  }
+  const donate = async (pId: number, amount: string) => {
+    const data = await contract?.call('donateCampaign', pId, { value: ethers.utils.parseEther(amount)});
+    return data;
+  }
+
+  const getDonations = async (pId: number) => {
+    const donations = await contract?.call('getDonators', pId);
+    const numberOfDonations = donations[0].length;
+
+    const parsedDonations = [];
+
+    for(let i = 0; i < numberOfDonations; i++) {
+      parsedDonations.push({
+        donator: donations[0][i],
+        donation: ethers.utils.formatEther(donations[1][i].toString())
+      })
+    }
+
+    return parsedDonations;
   }
 
   const value: StateContextValue = {
@@ -71,6 +93,8 @@ export const StateContextProvider = ({ children }: StateContextProviderProps) =>
     publishCampaign,
     getCampaigns,
     getUserCampaigns,
+    donate,
+    getDonations
   };
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>;
